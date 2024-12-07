@@ -7,12 +7,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.password);
         loginButton = findViewById(R.id.btnLogin);
         registerButton = findViewById(R.id.registerLink);
+
         // Inicializar Firebase
         auth = FirebaseAuth.getInstance();
 
@@ -36,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, Register.class);
             startActivity(intent);
         });
-
 
         loginButton.setOnClickListener(v -> {
             String email = emailField.getText().toString().trim();
@@ -52,14 +52,32 @@ public class MainActivity extends AppCompatActivity {
             auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(this, HomeView.class)); // Redirige a otra pantalla
-                            finish();
+                            FirebaseUser user = auth.getCurrentUser();
+
+                            // Obtener el nombre del usuario desde la base de datos
+                            if (user != null) {
+                                String userId = user.getUid();
+                                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users");
+                                databaseRef.child(userId).get().addOnCompleteListener(dbTask -> {
+                                    if (dbTask.isSuccessful() && dbTask.getResult().exists()) {
+                                        String username = dbTask.getResult().child("name").getValue(String.class);
+
+                                        // Redirigir al HomeView con el nombre del usuario
+                                        Intent intent = new Intent(MainActivity.this, HomeView.class);
+                                        intent.putExtra("username", username);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Toast.makeText(this, "Error al obtener datos del usuario", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(this, "Error al obtener usuario", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
         });
-
     }
 }
