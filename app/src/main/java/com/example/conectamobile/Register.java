@@ -74,9 +74,8 @@ public class Register extends AppCompatActivity {
                                     if (dbTask.isSuccessful()) {
                                         Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show();
 
-                                        // Pasar el nombre a la siguiente actividad
                                         Intent intent = new Intent(Register.this, HomeView.class);
-                                        intent.putExtra("username", name); // Asegúrate de usar "username"
+                                        intent.putExtra("username", name);
                                         startActivity(intent);
                                         finish();
                                     } else {

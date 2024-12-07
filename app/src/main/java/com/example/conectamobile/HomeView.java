@@ -1,6 +1,8 @@
 package com.example.conectamobile;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +19,8 @@ public class HomeView extends AppCompatActivity {
         setContentView(R.layout.activity_home_view);
 
         TextView welcomeText = findViewById(R.id.welcomeText);
+        Button editProfileButton = findViewById(R.id.btnEditProfile);
+        Button searchContacts = findViewById(R.id.btnSearchContacts);
 
         String username = getIntent().getStringExtra("username");
 
@@ -25,6 +29,16 @@ public class HomeView extends AppCompatActivity {
         } else {
             welcomeText.setText("Bienvenido");
         }
+
+        editProfileButton.setOnClickListener(view -> {
+            Intent intent = new Intent(HomeView.this, EditProfile.class);
+            startActivity(intent);
+        });
+
+        searchContacts.setOnClickListener(view -> {
+            Intent intent = new Intent(HomeView.this, SearchContactsActivity.class);
+            startActivity(intent);
+        });
 
 
     }

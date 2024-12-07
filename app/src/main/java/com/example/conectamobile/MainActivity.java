@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
                                 databaseRef.child(userId).get().addOnCompleteListener(dbTask -> {
                                     if (dbTask.isSuccessful() && dbTask.getResult().exists()) {
                                         String username = dbTask.getResult().child("name").getValue(String.class);
-
-                                        // Redirigir al HomeView con el nombre del usuario
                                         Intent intent = new Intent(MainActivity.this, HomeView.class);
                                         intent.putExtra("username", username);
                                         startActivity(intent);
